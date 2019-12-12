@@ -107,12 +107,8 @@ public class MessageReceiver extends Thread {
                 LOGGER.info("You: ");
 
                 String msg;
-                try {
-                    msg = br.readLine();
-                } catch (NoSuchElementException nsee) {
-                    msg = null;
+                msg = br.readLine();
 
-                }
                 if(msg == null) {
                     inSocket.close();
                     break;

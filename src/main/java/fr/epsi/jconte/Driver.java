@@ -4,6 +4,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Scanner;
 
 
@@ -42,6 +43,15 @@ public class Driver {
         LOGGER.info("Connected! Start sending messages now!");
     }
 
+    private static void waitForConnect(ConnectionManager connectionManager) throws InterruptedException, SocketException {
+
+        connectionManager = new ConnectionManager();
+        LOGGER.info("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
+        LOGGER.info("Waiting for connection...");
+        connectionManager.waitForConnection();
+        LOGGER.info("Connected! Start conversation now!");
+    }
+
     /**
      * Draws the terminal prompt, and loops through to provide the menu to the user
      */
@@ -59,25 +69,18 @@ public class Driver {
                         connect(connectionManager);
                         break;
 
-                    case 2: {
-                        connectionManager = new ConnectionManager();
-                        LOGGER.info("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
-                        LOGGER.info("Waiting for connection...");
-                        connectionManager.waitForConnection();
-                        LOGGER.info("Connected! Start conversation now!");
+                    case 2:
+                        waitForConnect(connectionManager);
                         break;
-                    }
 
-                    case 3: {
+                    case 3:
                         run = false;
                         break;
-                    }
 
-                    default: {
+                    default:
                         LOGGER.info("Error! Incorrect input, try again");
                         run = false;
                         break;
-                    }
                 }
 
                 if(connectionManager != null) {
