@@ -1,5 +1,7 @@
 package fr.epsi.jconte;
 
+import org.apache.log4j.Logger;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -10,6 +12,7 @@ import java.util.Scanner;
 public class Sender {
     private String name;
     private InetAddress inetAddr;
+    public final static Logger LOGGER = Logger.getLogger(Sender.class);
 
     /**
      * Represents the current sender.
@@ -49,16 +52,16 @@ public class Sender {
 
         Scanner s = new Scanner(System.in);
 
-        System.out.print("Enter the name of the sender: ");
+        LOGGER.info("Enter the name of the sender: ");
         senderName = s.nextLine();
-        System.out.print("Enter the IP address of the sender: ");
+        LOGGER.info("Enter the IP address of the sender: ");
         senderIp = s.next();
 
         try {
             senderAddr = InetAddress.getByName(senderIp);
         }
         catch (UnknownHostException uhe) {
-            System.out.println("Error! Invalid IP address!");
+            LOGGER.info("Error! Invalid IP address!");
             return null;
         }
         return new Sender(senderName, senderAddr);

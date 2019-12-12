@@ -1,6 +1,8 @@
 package fr.epsi.jconte;
 
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -22,42 +24,45 @@ public class ConnectionManager {
     private ServerSocket inboundConnectionListener; //The socket to connect to
     private Socket mSocket; //The socket for transmitting the strings
     private Sender sender;
+    private static StringBuilder stringBuilder;
+    public final static Logger LOGGER = Logger.getLogger(ConnectionManager.class);
 
     /**
      * The default port for communication
      */
-    public static int defaultPort = 9990;
+    public final static int DEFAULT_PORT = 9990;
 
     /**
      * The maximum number of failed tries after we give up trying to connect
      */
-    public static int maxNumTries = 10;
+    public final static int MAX_NUM_TRIES = 10;
 
     /**
      * Get the current user's IP address.
      * @return The IPv4 address of the user
      */
-    public static String getMyInetAddress() {
+    public static String getMyInetAddress() throws SocketException {
         String ip = "";
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface iface = interfaces.nextElement();
-                // filters out 127.0.0.1 and inactive interfaces
-                if (iface.isLoopback() || !iface.isUp())
-                    continue;
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface iface = interfaces.nextElement();
+            // filters out 127.0.0.1 and inactive interfaces
+            if (iface.isLoopback() || !iface.isUp())
+                continue;
 
-                Enumeration<InetAddress> addresses = iface.getInetAddresses();
-                while(addresses.hasMoreElements()) {
-                    InetAddress addr = addresses.nextElement();
-                    ip += iface.getDisplayName() + ": " + addr.getHostAddress() + '\n';
-                }
+            Enumeration<InetAddress> addresses = iface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                InetAddress addr = addresses.nextElement();
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(iface.getDisplayName());
+                stringBuilder.append(": ");
+                stringBuilder.append(addr.getHostAddress());
+                stringBuilder.append("\n");
+                ip += stringBuilder.toString();
             }
-
-            return ip;
-        } catch (SocketException e) {
-            throw new RuntimeException(e);
         }
+
+        return ip;
     }
 
     /**
@@ -70,14 +75,14 @@ public class ConnectionManager {
     public ConnectionManager(Sender s) throws IOException, InterruptedException {
         this.sender = s;
 
-        //In case the connection fails, we retry maxNumTries times. If we still don't connect, throw
+        //In case the connection fails, we retry MAX_NUM_TRIES times. If we still don't connect, throw
         //an IOException
-        int numTries = ConnectionManager.maxNumTries;
+        int numTries = ConnectionManager.MAX_NUM_TRIES;
         while(numTries > 0) {
             try {
-                mSocket = new Socket(this.sender.getInetAddr(), defaultPort);
+                mSocket = new Socket(this.sender.getInetAddr(), DEFAULT_PORT);
             } catch (ConnectException ce) {
-                System.out.println("Connection Failed. " + numTries + " tries left...");
+                LOGGER.info("Connection Failed. " + numTries + " tries left...");
                 mSocket = null;
                 Thread.sleep(1000);
             }
@@ -111,16 +116,16 @@ public class ConnectionManager {
 
 
     /**
-     * Get the {@link com.P2PChat.networking.MessageSender} associated with this connection manager.
-     * @return The {@link com.P2PChat.networking.MessageSender} associated with this connection manager.
+     * Get the {@link fr.epsi.jconte.MessageSender} associated with this connection manager.
+     * @return The {@link fr.epsi.jconte.MessageSender} associated with this connection manager.
      */
     public MessageSender getMessageSender() {
         return messageSender;
     }
 
     /**
-     * Get the {@link com.P2PChat.networking.MessageReceiver} associated with this connection manager.
-     * @return The {@link com.P2PChat.networking.MessageReceiver} associated with this connection manager.
+     * Get the {@link fr.epsi.jconte.MessageReceiver} associated with this connection manager.
+     * @return The {@link fr.epsi.jconte.MessageReceiver} associated with this connection manager.
      */
     public MessageReceiver getMessageReceiver() {
         return messageReceiver;
@@ -148,7 +153,7 @@ public class ConnectionManager {
             Socket s = inboundConnectionListener.accept();
 
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter the person's name: ");
+            LOGGER.info("Enter the person's name: ");
             String senderName = scanner.nextLine();
 
             InetAddress senderAddr = s.getInetAddress();
@@ -164,7 +169,7 @@ public class ConnectionManager {
             connect();
         }
         catch (IOException ioe) {
-            System.out.println("\nIO Error during waiting!");
+            LOGGER.info("\nIO Error during waiting!");
         }
     }
 
@@ -181,7 +186,7 @@ public class ConnectionManager {
             Sender.setCurrentSender(null);
         }
         catch (IOException ioe) {
-            System.out.println("\nUnable to close connection to " + sender.getName());
+            LOGGER.info("\nUnable to close connection to " + sender.getName());
         }
     }
 }

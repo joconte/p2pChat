@@ -1,5 +1,8 @@
 package fr.epsi.jconte;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -9,6 +12,9 @@ import java.util.Scanner;
  */
 
 public class Driver {
+
+    public final static Logger LOGGER = Logger.getLogger(Driver.class);
+
     /**
      * Text to prompt the user for input
      */
@@ -23,6 +29,8 @@ public class Driver {
      * @param args The command line arguments passed. We don't use them here though
      */
     public static void main(String[] args){
+
+        BasicConfigurator.configure();
         prompt();
     }
 
@@ -35,7 +43,7 @@ public class Driver {
         Scanner s = new Scanner(System.in);
 
         while(true) {
-            System.out.print(TERMINAL_PROMPT);
+            LOGGER.info(TERMINAL_PROMPT);
             int n = s.nextInt();
             try {
                 switch (n) {
@@ -43,16 +51,16 @@ public class Driver {
                         Sender sender = Sender.createSenderFromStdin();
                         connectionManager = new ConnectionManager(sender);
                         connectionManager.connect();
-                        System.out.println("Connected! Start sending messages now!");
+                        LOGGER.info("Connected! Start sending messages now!");
                         break;
                     }
 
                     case 2: {
                         connectionManager = new ConnectionManager();
-                        System.out.println("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
-                        System.out.println("Waiting for connection...");
+                        LOGGER.info("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
+                        LOGGER.info("Waiting for connection...");
                         connectionManager.waitForConnection();
-                        System.out.println("Connected! Start conversation now!");
+                        LOGGER.info("Connected! Start conversation now!");
                         break;
                     }
 
@@ -61,7 +69,7 @@ public class Driver {
                     }
 
                     default: {
-                        System.out.println("Error! Incorrect input, try again");
+                        LOGGER.info("Error! Incorrect input, try again");
                         break;
                     }
                 }
@@ -70,9 +78,9 @@ public class Driver {
                     connectionManager.getMessageReceiver().join();
                     connectionManager.getMessageSender().join();
                 }
-                System.out.println("Connection Terminated!");
+                LOGGER.info("Connection Terminated!");
             } catch (IOException | InterruptedException e) { //If any of these exception is raised, disconnect and redraw prompt
-                System.out.println("Connection error! Disconnecting...");
+                LOGGER.info("Connection error! Disconnecting...");
                 if(connectionManager != null) {
                     connectionManager.disconnect();
                 }

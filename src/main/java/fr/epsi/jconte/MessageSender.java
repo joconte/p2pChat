@@ -1,6 +1,8 @@
 package fr.epsi.jconte;
 
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -19,6 +21,7 @@ public class MessageSender extends Thread {
     private int outPort;
     private boolean done;
     private List<Message> messageList;
+    public final static Logger LOGGER = Logger.getLogger(MessageSender.class);
 
     /**
      * The default port for outgoing communication
@@ -99,13 +102,13 @@ public class MessageSender extends Thread {
                 if(hasNextMessage()) {
                     pw.println(getNextMessage().getMessage());
                     pw.flush(); //Flush the buffer, just to make sure
-                    System.out.print("You: "); //After we hit enter, we need to reprint "You: " otherwise the line becomes empty
+                    LOGGER.info("You: "); //After we hit enter, we need to reprint "You: " otherwise the line becomes empty
                 }
             }
-            System.out.println();
+            //LOGGER.info();
         }
         catch (IOException ioe) {
-            System.out.println("Connection Error!");
+            LOGGER.info("Connection Error!");
         }
     }
 }

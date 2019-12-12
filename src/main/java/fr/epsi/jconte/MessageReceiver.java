@@ -1,6 +1,8 @@
 package fr.epsi.jconte;
 
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,6 +21,7 @@ public class MessageReceiver extends Thread {
     private int inPort;
     private boolean done;
     private List<Message> messageList;
+    public final static Logger LOGGER = Logger.getLogger(MessageReceiver.class);
 
     /**
      * The default port for incoming communication
@@ -101,7 +104,7 @@ public class MessageReceiver extends Thread {
                 }
 
                 //This is for the terminal output, to signify we are typing the message
-                System.out.print("You: ");
+                LOGGER.info("You: ");
 
                 String msg;
                 try {
@@ -119,16 +122,16 @@ public class MessageReceiver extends Thread {
 
                 //Prints a bunch of backspaces before printing the message. This is to remove the
                 //"You:" that is already there. It will get reprinted when the loop goes through another iteration
-                System.out.print("\b\b\b\b\b\b");
+                LOGGER.info("\b\b\b\b\b\b");
 
-                System.out.println(senderName + ": " + message.getMessage());
+                LOGGER.info(senderName + ": " + message.getMessage());
             }
 
-            System.out.println();
+            //LOGGER.info();
 
         }
         catch (IOException ioe) {
-            System.out.println("Connection Error!");
+            LOGGER.info("Connection Error!");
         }
     }
 }
