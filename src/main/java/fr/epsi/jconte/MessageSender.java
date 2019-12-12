@@ -21,12 +21,12 @@ public class MessageSender extends Thread {
     private int outPort;
     private boolean done;
     private List<Message> messageList;
-    public final static Logger LOGGER = Logger.getLogger(MessageSender.class);
+    public static final Logger LOGGER = Logger.getLogger(MessageSender.class);
 
     /**
      * The default port for outgoing communication
      */
-    public static final int defaultOutPort = 9990;
+    public static final int DEFAULT_OUT_PORT = 9990;
 
     /**
      * Create a MessageSender with the default port
@@ -34,8 +34,8 @@ public class MessageSender extends Thread {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MessageSender(Socket outSocket) throws InterruptedException, IOException {
-        this(outSocket, defaultOutPort);
+    public MessageSender(Socket outSocket) {
+        this(outSocket, DEFAULT_OUT_PORT);
     }
 
     /**
@@ -45,9 +45,9 @@ public class MessageSender extends Thread {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MessageSender(Socket outSocket, int outPort) throws InterruptedException, IOException {
+    public MessageSender(Socket outSocket, int outPort) {
         super();
-        this.outPort = defaultOutPort;
+        this.outPort = DEFAULT_OUT_PORT;
         this.done = false;
         this.messageList = new LinkedList<>();
         this.outSocket = outSocket;
@@ -75,7 +75,7 @@ public class MessageSender extends Thread {
     }
 
     public boolean hasNextMessage() {
-        return messageList.size() != 0;
+        return !messageList.isEmpty();
     }
 
     /**

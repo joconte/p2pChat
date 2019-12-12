@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class Driver {
 
-    public final static Logger LOGGER = Logger.getLogger(Driver.class);
+    public static final Logger LOGGER = Logger.getLogger(Driver.class);
 
     /**
      * Text to prompt the user for input

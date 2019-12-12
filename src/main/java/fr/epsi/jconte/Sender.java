@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class Sender {
     private String name;
     private InetAddress inetAddr;
-    public final static Logger LOGGER = Logger.getLogger(Sender.class);
+    public static final Logger LOGGER = Logger.getLogger(Sender.class);
 
     /**
      * Represents the current sender.

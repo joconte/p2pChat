@@ -154,8 +154,7 @@ public class ConnectionManager {
             String senderName = scanner.nextLine();
 
             InetAddress senderAddr = s.getInetAddress();
-            Sender sender = new Sender(senderName, senderAddr);
-            this.sender = sender;
+            this.sender = new Sender(senderName, senderAddr);
             Sender.setCurrentSender(sender);
 
             mSocket = s;

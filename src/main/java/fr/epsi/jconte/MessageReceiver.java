@@ -21,7 +21,7 @@ public class MessageReceiver extends Thread {
     private int inPort;
     private boolean done;
     private List<Message> messageList;
-    public final static Logger LOGGER = Logger.getLogger(MessageReceiver.class);
+    public static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
 
     /**
      * The default port for incoming communication
@@ -34,7 +34,7 @@ public class MessageReceiver extends Thread {
      * @throws IOException
      * @throws InterruptedException
      */
-    public MessageReceiver(Socket inSocket) throws IOException, InterruptedException {
+    public MessageReceiver(Socket inSocket){
         this(inSocket, DEFAULTINPORT);
     }
 
@@ -45,7 +45,7 @@ public class MessageReceiver extends Thread {
      * @throws IOException
      * @throws InterruptedException
      */
-    public MessageReceiver(Socket inSocket, int inPort) throws IOException, InterruptedException {
+    public MessageReceiver(Socket inSocket, int inPort) {
         super();
         this.inPort = inPort;
         this.done = false;
@@ -71,7 +71,7 @@ public class MessageReceiver extends Thread {
     }
 
     public boolean hasNextMessage() {
-        return messageList.size() != 0;
+        return !messageList.isEmpty();
     }
 
     public Message getNextMessage() {
