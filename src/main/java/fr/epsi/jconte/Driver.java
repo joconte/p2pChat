@@ -28,7 +28,7 @@ public class Driver {
      * Entry point of the application
      * @param args The command line arguments passed. We don't use them here though
      */
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         BasicConfigurator.configure();
         prompt();
@@ -38,11 +38,12 @@ public class Driver {
      * Draws the terminal prompt, and loops through to provide the menu to the user
      */
 
-    public static void prompt() {
+    public static void prompt() throws IOException, InterruptedException {
         ConnectionManager connectionManager = null;
         Scanner s = new Scanner(System.in);
+        boolean run = true;
 
-        while(true) {
+        while(run) {
             LOGGER.info(TERMINAL_PROMPT);
             int n = s.nextInt();
             try {
@@ -65,11 +66,13 @@ public class Driver {
                     }
 
                     case 3: {
-                        System.exit(0);
+                        run = false;
+                        break;
                     }
 
                     default: {
                         LOGGER.info("Error! Incorrect input, try again");
+                        run = false;
                         break;
                     }
                 }
@@ -84,6 +87,7 @@ public class Driver {
                 if(connectionManager != null) {
                     connectionManager.disconnect();
                 }
+                throw e;
             }
         }
     }
