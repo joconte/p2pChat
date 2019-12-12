@@ -34,10 +34,17 @@ public class Driver {
         prompt();
     }
 
+    private static void connect(ConnectionManager connectionManager) throws IOException, InterruptedException {
+
+        Sender sender = Sender.createSenderFromStdin();
+        connectionManager = new ConnectionManager(sender);
+        connectionManager.connect();
+        LOGGER.info("Connected! Start sending messages now!");
+    }
+
     /**
      * Draws the terminal prompt, and loops through to provide the menu to the user
      */
-
     public static void prompt() throws IOException, InterruptedException {
         ConnectionManager connectionManager = null;
         Scanner s = new Scanner(System.in);
@@ -48,13 +55,9 @@ public class Driver {
             int n = s.nextInt();
             try {
                 switch (n) {
-                    case 1: {
-                        Sender sender = Sender.createSenderFromStdin();
-                        connectionManager = new ConnectionManager(sender);
-                        connectionManager.connect();
-                        LOGGER.info("Connected! Start sending messages now!");
+                    case 1:
+                        connect(connectionManager);
                         break;
-                    }
 
                     case 2: {
                         connectionManager = new ConnectionManager();
