@@ -23,7 +23,7 @@ public class MessageReceiver extends Thread {
     /**
      * The default port for incoming communication
      */
-    public static final int defaultInPort = 9990;
+    public static final int DEFAULTINPORT = 9990;
 
     /**
      * Create a MessageReceiver with the default port.
@@ -32,7 +32,7 @@ public class MessageReceiver extends Thread {
      * @throws InterruptedException
      */
     public MessageReceiver(Socket inSocket) throws IOException, InterruptedException {
-        this(inSocket, defaultInPort);
+        this(inSocket, DEFAULTINPORT);
     }
 
     /**
