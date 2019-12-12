@@ -24,18 +24,17 @@ public class ConnectionManager {
     private ServerSocket inboundConnectionListener; //The socket to connect to
     private Socket mSocket; //The socket for transmitting the strings
     private Sender sender;
-    private static StringBuilder stringBuilder;
-    public final static Logger LOGGER = Logger.getLogger(ConnectionManager.class);
+    public static final Logger LOGGER = Logger.getLogger(ConnectionManager.class);
 
     /**
      * The default port for communication
      */
-    public final static int DEFAULT_PORT = 9990;
+    public static final int DEFAULT_PORT = 9990;
 
     /**
      * The maximum number of failed tries after we give up trying to connect
      */
-    public final static int MAX_NUM_TRIES = 10;
+    public static final int MAX_NUM_TRIES = 10;
 
     /**
      * Get the current user's IP address.
@@ -53,7 +52,7 @@ public class ConnectionManager {
             Enumeration<InetAddress> addresses = iface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress addr = addresses.nextElement();
-                stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(iface.getDisplayName());
                 stringBuilder.append(": ");
                 stringBuilder.append(addr.getHostAddress());
