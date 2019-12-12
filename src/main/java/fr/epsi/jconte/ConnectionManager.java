@@ -41,7 +41,7 @@ public class ConnectionManager {
      * @return The IPv4 address of the user
      */
     public static String getMyInetAddress() throws SocketException {
-        String ip = "";
+        StringBuilder stringBuilder = new StringBuilder();
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface iface = interfaces.nextElement();
@@ -52,16 +52,14 @@ public class ConnectionManager {
             Enumeration<InetAddress> addresses = iface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress addr = addresses.nextElement();
-                StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(iface.getDisplayName());
                 stringBuilder.append(": ");
                 stringBuilder.append(addr.getHostAddress());
                 stringBuilder.append("\n");
-                ip += stringBuilder.toString();
             }
         }
 
-        return ip;
+        return stringBuilder.toString();
     }
 
     /**
