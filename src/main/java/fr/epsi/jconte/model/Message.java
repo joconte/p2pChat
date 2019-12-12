@@ -1,4 +1,4 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.model;
 
 /**
  * Describes a message that we receive. Contains information about the sender, and the message String

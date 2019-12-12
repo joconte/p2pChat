@@ -1,6 +1,8 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.service.impl;
 
 
+import fr.epsi.jconte.model.Message;
+import fr.epsi.jconte.model.Sender;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ public class MessageSender extends Thread {
     private int outPort;
     private boolean done;
     private List<Message> messageList;
+    private Sender sender;
     public static final Logger LOGGER = Logger.getLogger(MessageSender.class);
 
     /**
@@ -34,8 +37,8 @@ public class MessageSender extends Thread {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MessageSender(Socket outSocket) {
-        this(outSocket, DEFAULT_OUT_PORT);
+    public MessageSender(Socket outSocket, Sender sender) {
+        this(outSocket, DEFAULT_OUT_PORT, sender);
     }
 
     /**
@@ -45,12 +48,13 @@ public class MessageSender extends Thread {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MessageSender(Socket outSocket, int outPort) {
+    public MessageSender(Socket outSocket, int outPort, Sender sender) {
         super();
-        this.outPort = DEFAULT_OUT_PORT;
+        this.outPort = outPort;
         this.done = false;
         this.messageList = new LinkedList<>();
         this.outSocket = outSocket;
+        this.sender = sender;
     }
 
     public Socket getOutSocket() {
@@ -98,7 +102,7 @@ public class MessageSender extends Thread {
                 }
 
                 String msg = s.nextLine();
-                addMessage(new Message(msg, Sender.getCurrentSender()));
+                addMessage(new Message(msg, this.sender));
                 if(hasNextMessage()) {
                     pw.println(getNextMessage().getMessage());
                     pw.flush(); //Flush the buffer, just to make sure

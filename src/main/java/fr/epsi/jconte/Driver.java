@@ -1,10 +1,15 @@
 package fr.epsi.jconte;
 
+import fr.epsi.jconte.model.Choice;
+import fr.epsi.jconte.model.Sender;
+import fr.epsi.jconte.service.*;
+import fr.epsi.jconte.service.impl.AskUserChoiceConsole;
+import fr.epsi.jconte.service.impl.ConnectionManager;
+import fr.epsi.jconte.service.impl.CreateSenderFromConsole;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Scanner;
 
 
@@ -17,39 +22,70 @@ public class Driver {
     public static final Logger LOGGER = Logger.getLogger(Driver.class);
 
     /**
-     * Text to prompt the user for input
-     */
-    public static final String TERMINAL_PROMPT = "Welcome!\n" +
-            "1. Connect to a person\n" +
-            "2. Wait for someone to connect\n" +
-            "3. Exit\n" +
-            "Select what to do: ";
-
-    /**
      * Entry point of the application
      * @param args The command line arguments passed. We don't use them here though
      */
     public static void main(String[] args) throws IOException, InterruptedException {
 
+        // Configure logger
         BasicConfigurator.configure();
-        prompt();
-    }
 
-    private static void connect(ConnectionManager connectionManager) throws IOException, InterruptedException {
+        // Init param
+        ICreateSender createSender = new CreateSenderFromConsole();
+        IValidateSenderIp validateSenderIp = new ValidateSenderIp();
+        ConnectionManager connectionManager = null;
 
-        Sender sender = Sender.createSenderFromStdin();
-        connectionManager = new ConnectionManager(sender);
-        connectionManager.connect();
-        LOGGER.info("Connected! Start sending messages now!");
-    }
+        // Get user choice
+        IAskUserChoice askUserChoice = new AskUserChoiceConsole();
+        Choice userChoice = askUserChoice.askForUserChoice();
 
-    private static void waitForConnect(ConnectionManager connectionManager) throws InterruptedException, SocketException {
+        // Repeat until good choice
+        while (userChoice == null) {
+            LOGGER.info("Bad choice, try again please.");
+            userChoice = askUserChoice.askForUserChoice();
+        }
 
-        connectionManager = new ConnectionManager();
-        LOGGER.info("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
-        LOGGER.info("Waiting for connection...");
-        connectionManager.waitForConnection();
-        LOGGER.info("Connected! Start conversation now!");
+        switch (userChoice) {
+            case CONNECT:
+                // Get sender name and ip from console
+                Sender sender = createSender.createSender();
+
+                // Validate ip
+                while (sender.getInetAddr() == null) {
+                    validateSenderIp.validate(sender);
+                }
+
+                // Connection
+                connectionManager = new ConnectionManager(sender);
+                connectionManager.validateSocket();
+                connectionManager.connect();
+
+                LOGGER.info("Connected! Start sending messages now!");
+                break;
+
+            case WAIT_FOR_CONNECTION:
+
+                connectionManager = new ConnectionManager();
+                LOGGER.info("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
+                LOGGER.info("Waiting for connection...");
+                connectionManager.waitForConnection();
+                LOGGER.info("Connected! Start conversation now!");
+                break;
+
+            case EXIT:
+                break;
+
+            default:
+                LOGGER.info("Error! Incorrect input, try again");
+                break;
+        }
+
+        if(connectionManager != null) {
+            connectionManager.getMessageReceiver().join();
+            connectionManager.getMessageSender().join();
+        }
+        LOGGER.info("Connection Terminated!");
+
     }
 
     /**
@@ -59,18 +95,25 @@ public class Driver {
         ConnectionManager connectionManager = null;
         Scanner s = new Scanner(System.in);
         boolean run = true;
-
+/*
         while(run) {
             LOGGER.info(TERMINAL_PROMPT);
             int n = s.nextInt();
             try {
                 switch (n) {
                     case 1:
-                        connect(connectionManager);
+                        Sender sender = Sender.createSenderFromStdin();
+                        connectionManager = new ConnectionManager(sender);
+                        connectionManager.connect();
+                        LOGGER.info("Connected! Start sending messages now!");
                         break;
 
                     case 2:
-                        waitForConnect(connectionManager);
+                        connectionManager = new ConnectionManager();
+                        LOGGER.info("Your IP address is:\n" + ConnectionManager.getMyInetAddress());
+                        LOGGER.info("Waiting for connection...");
+                        connectionManager.waitForConnection();
+                        LOGGER.info("Connected! Start conversation now!");
                         break;
 
                     case 3:
@@ -79,7 +122,6 @@ public class Driver {
 
                     default:
                         LOGGER.info("Error! Incorrect input, try again");
-                        run = false;
                         break;
                 }
 
@@ -95,6 +137,6 @@ public class Driver {
                 }
                 throw e;
             }
-        }
+        }*/
     }
 }

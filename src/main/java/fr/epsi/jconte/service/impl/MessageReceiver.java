@@ -1,6 +1,8 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.service.impl;
 
 
+import fr.epsi.jconte.model.Message;
+import fr.epsi.jconte.model.Sender;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -9,7 +11,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * This is the thread that works in the background and helps in receiving messages by reading input from the socket
@@ -21,6 +22,7 @@ public class MessageReceiver extends Thread {
     private int inPort;
     private boolean done;
     private List<Message> messageList;
+    private Sender sender;
     public static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
 
     /**
@@ -34,8 +36,8 @@ public class MessageReceiver extends Thread {
      * @throws IOException
      * @throws InterruptedException
      */
-    public MessageReceiver(Socket inSocket){
-        this(inSocket, DEFAULTINPORT);
+    public MessageReceiver(Socket inSocket, Sender sender){
+        this(inSocket, DEFAULTINPORT, sender);
     }
 
     /**
@@ -45,12 +47,13 @@ public class MessageReceiver extends Thread {
      * @throws IOException
      * @throws InterruptedException
      */
-    public MessageReceiver(Socket inSocket, int inPort) {
+    public MessageReceiver(Socket inSocket, int inPort, Sender sender) {
         super();
         this.inPort = inPort;
         this.done = false;
         this.messageList = new LinkedList<>();
         this.inSocket = inSocket;
+        this.sender = sender;
     }
 
     public Socket getInSocket() {
@@ -91,7 +94,7 @@ public class MessageReceiver extends Thread {
             InputStreamReader isr = new InputStreamReader(inSocket.getInputStream());
             BufferedReader br = new BufferedReader(isr);
 
-            String senderName = Sender.getCurrentSender().getName();
+            String senderName = this.sender.getName();
 
             while(true) {
                 //If someone (usually the connection manager) sets done, stop execution
@@ -113,7 +116,7 @@ public class MessageReceiver extends Thread {
                     inSocket.close();
                     break;
                 }
-                addMessage(new Message(msg, Sender.getCurrentSender()));
+                addMessage(new Message(msg, this.sender));
                 Message message = getNextMessage();
 
                 //Prints a bunch of backspaces before printing the message. This is to remove the

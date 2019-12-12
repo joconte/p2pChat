@@ -1,6 +1,7 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.service.impl;
 
 
+import fr.epsi.jconte.model.Sender;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -62,13 +63,42 @@ public class ConnectionManager {
         return stringBuilder.toString();
     }
 
+
+    public ConnectionManager(Sender sender) {
+        this.sender = sender;
+    }
+
+    public void validateSocket() throws InterruptedException, IOException {
+
+        int numTries = ConnectionManager.MAX_NUM_TRIES;
+        while(numTries > 0) {
+            try {
+                mSocket = new Socket(this.sender.getInetAddr(), DEFAULT_PORT);
+            } catch (ConnectException ce) {
+                LOGGER.info("Connection Failed. " + numTries + " tries left...");
+                mSocket = null;
+                Thread.sleep(1000);
+            }
+
+            if (mSocket == null) {
+                numTries--;
+            } else {
+                break;
+            }
+        }
+
+        //If mSocket is null, it means we failed to connect. So throw an IOException
+        if(mSocket == null) {
+            throw new IOException("Connection failed!");
+        }
+    }
     /**
      * Create a ConnectionManager with the details of the given Sender. The port is set to the default port.
      * @param s The sender, which has the IP address and other details about the peer
      * @throws IOException In case the connection fails
      * @throws InterruptedException We sleep for 1000ms after every failed connection try. This is in case the thread is interrupted
      */
-
+/*
     public ConnectionManager(Sender s) throws IOException, InterruptedException {
         this.sender = s;
 
@@ -100,7 +130,7 @@ public class ConnectionManager {
         messageReceiver = new MessageReceiver(mSocket);
         inboundConnectionListener = null;
     }
-
+*/
     /**
      * Create an empty connection manager that we can configure later
      */
@@ -113,16 +143,16 @@ public class ConnectionManager {
 
 
     /**
-     * Get the {@link fr.epsi.jconte.MessageSender} associated with this connection manager.
-     * @return The {@link fr.epsi.jconte.MessageSender} associated with this connection manager.
+     * Get the {@link MessageSender} associated with this connection manager.
+     * @return The {@link MessageSender} associated with this connection manager.
      */
     public MessageSender getMessageSender() {
         return messageSender;
     }
 
     /**
-     * Get the {@link fr.epsi.jconte.MessageReceiver} associated with this connection manager.
-     * @return The {@link fr.epsi.jconte.MessageReceiver} associated with this connection manager.
+     * Get the {@link MessageReceiver} associated with this connection manager.
+     * @return The {@link MessageReceiver} associated with this connection manager.
      */
     public MessageReceiver getMessageReceiver() {
         return messageReceiver;
@@ -132,7 +162,11 @@ public class ConnectionManager {
      * Connect to the current {@link Sender}
      */
     public void connect() {
-        Sender.setCurrentSender(sender);
+        messageSender = new MessageSender(mSocket, sender);
+        messageReceiver = new MessageReceiver(mSocket, sender);
+        inboundConnectionListener = null;
+
+        //Sender.setCurrentSender(sender);
 
         messageSender.start();
         messageReceiver.start();
@@ -155,12 +189,12 @@ public class ConnectionManager {
 
             InetAddress senderAddr = s.getInetAddress();
             this.sender = new Sender(senderName, senderAddr);
-            Sender.setCurrentSender(sender);
+            //Sender.setCurrentSender(sender);
 
             mSocket = s;
 
-            messageReceiver = new MessageReceiver(mSocket);
-            messageSender = new MessageSender(mSocket);
+            messageReceiver = new MessageReceiver(mSocket, sender);
+            messageSender = new MessageSender(mSocket, sender);
 
             connect();
         }
@@ -179,7 +213,6 @@ public class ConnectionManager {
 
             mSocket.close();
 
-            Sender.setCurrentSender(null);
         }
         catch (IOException ioe) {
             LOGGER.info("\nUnable to close connection to " + sender.getName());
