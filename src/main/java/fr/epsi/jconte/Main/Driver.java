@@ -1,5 +1,8 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.Main;
 
+
+import fr.epsi.jconte.Util.ConnectionManager;
+import fr.epsi.jconte.Util.Sender;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 

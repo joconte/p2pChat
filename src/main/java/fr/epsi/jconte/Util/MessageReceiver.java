@@ -1,4 +1,4 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.Util;
 
 
 import org.apache.log4j.Logger;
@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * This is the thread that works in the background and helps in receiving messages by reading input from the socket
