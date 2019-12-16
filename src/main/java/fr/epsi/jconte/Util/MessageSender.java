@@ -1,4 +1,4 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.Util;
 
 
 import org.apache.log4j.Logger;

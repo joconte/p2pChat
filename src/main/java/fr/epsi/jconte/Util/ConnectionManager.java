@@ -1,4 +1,4 @@
-package fr.epsi.jconte;
+package fr.epsi.jconte.Util;
 
 
 import org.apache.log4j.Logger;
@@ -113,16 +113,16 @@ public class ConnectionManager {
 
 
     /**
-     * Get the {@link fr.epsi.jconte.MessageSender} associated with this connection manager.
-     * @return The {@link fr.epsi.jconte.MessageSender} associated with this connection manager.
+     * Get the {@link MessageSender} associated with this connection manager.
+     * @return The {@link MessageSender} associated with this connection manager.
      */
     public MessageSender getMessageSender() {
         return messageSender;
     }
 
     /**
-     * Get the {@link fr.epsi.jconte.MessageReceiver} associated with this connection manager.
-     * @return The {@link fr.epsi.jconte.MessageReceiver} associated with this connection manager.
+     * Get the {@link MessageReceiver} associated with this connection manager.
+     * @return The {@link MessageReceiver} associated with this connection manager.
      */
     public MessageReceiver getMessageReceiver() {
         return messageReceiver;
